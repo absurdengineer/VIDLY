@@ -1,75 +1,74 @@
 const express = require('express')
 const Joi = require('joi')
+const pool = require('../../databases/db')
 
 router = express.Router()
 
-const genres = [
-    {
-        id : 1,
-        name : "Action"
-    },
-    {
-        id : 2,
-        name : "Romantic"
-    },
-    {
-        id : 3,
-        name : "Adventure"
-    },
-    {
-        id : 4,
-        name : "Sci-fi"
-    },
-    {
-        id : 5,
-        name : "Fantasy"
-    }
-]
-
+const genreSchema = Joi.object({
+    name : Joi.string().min(3).max(30).required()
+})
 const validateGenre = genre => {
-    const schema = Joi.object({
-        name : Joi.string().min(3).max(30).required()
-    })
-    return schema.validate(genre)
+    return genreSchema.validate(genre)
 }
 
-const checkGenre = id => genres.find(genre => genre.id === parseInt(id))
-
-router.get("/",(req,res) => {
-    res.status(200).send(genres)
-})
-
-router.get("/:id",(req,res) => {
-    const genre = checkGenre(req.params.id)
-    if(!genre) return res.status(404).send("Genre with the povided ID doesn't exists.")
-    return res.status(200).send(genre)
-})
-
-router.post("/",(req,res) => {
-    const {error} = validateGenre(req.body)
-    if(error) return res.status(400).send(error.message)
-    genre = {
-        id : genres.length + 1,
-        name : req.body.name
+router.get("/", async (req,res) => {
+    try{
+        const result = await pool.query('SELECT *  FROM genres')
+        if(result.rowCount === 0)
+            return res.status(200).send("There is no Data in this API.")
+        return res.status(200).json(result.rows)
+    } catch({name, message}){
+        console.error(`${name} : ${message}`)
     }
-    genres.push(genre)
-    return res.status(200).send(genre)
 })
-
-router.put("/:id",(req,res) => {
-    const genre = checkGenre(req.params.id)
-    if(!genre) return res.status(404).send("Genre with the povided ID doesn't exists. ")
+router.get("/:id", async (req,res) => {
+    const id = parseInt(req.params.id)
+    try{
+        const result = await pool.query(`SELECT *  FROM genres WHERE id=${id}`)
+        if(result.rowCount === 0)
+            return res.status(404).send("Invalid Id : There is no genre with the provided Id.")
+        return res.status(200).json(result.rows[0])
+    } catch({name, message}){
+        console.error(`${name} : ${message}`)
+    }
+})
+router.post("/", async (req,res) => {
     const {error} = validateGenre(req.body)
     if(error) return res.status(400).send(error.message)
-    genre.name = req.body.name
-    return res.status(200).send(genre)
+    const {name} = req.body
+    try{
+        const result = await pool.query(`INSERT INTO genres VALUES(DEFAULT, '${name}') RETURNING *`)
+        return res.status(200).send(result.rows[0])
+    } catch({name,message}){
+        console.error(`${name} : ${message}`)
+    }
 })
-
-router.delete("/:id",(req,res) => {
-    const genre = checkGenre(req.params.id)
-    if(!genre) return res.status(404).send("Genre with the provided ID doesn't exists. ") 
-    genres.splice(genre.id - 1, 1)
-    return res.status(200).send(genre)
+router.put("/:id", async (req,res) => {
+    const id = parseInt(req.params.id)
+    let result = await pool.query(`SELECT *  FROM genres WHERE id=${id}`)
+    if(result.rowCount === 0)
+        return res.status(404).send("Invalid Id : There is no genre with the provided Id.")
+    const {error} = validateGenre(req.body)
+    if(error) return res.status(400).send(error.message)
+    const {name} = req.body
+    try{
+        result = await pool.query(`UPDATE genres SET name='${name}' WHERE id=${id} RETURNING *`)
+        return res.status(200).json(result.rows[0])
+    } catch({name,message}){
+        console.error(`${name} : ${message}`)
+    }
+})
+router.delete("/:id", async (req,res) => {
+    const id = parseInt(req.params.id)
+    let result = await pool.query(`SELECT *  FROM genres WHERE id=${id}`)
+    if(result.rowCount === 0)
+        return res.status(404).send("Invalid Id : Genre with the provided ID doesn't exists. ")
+    try{
+        result = await pool.query(`DELETE FROM genres WHERE id=${id} RETURNING *`)
+        return res.status(200).json(result.rows[0])
+    } catch({name, message}){
+        console.error(`${name} : ${message}`)
+    }
 })
 
 module.exports = router
