@@ -1,6 +1,7 @@
 const express = require('express')
 const pool = require('../../databases/db')
 const { validateMovie, checkMovie } = require('../../models/movie.model')
+const { checkGenre } = require('../../models/genre.model')
 
 const router = express.Router()
 
@@ -23,9 +24,11 @@ router.get('/:id',async (req, res) => {
     }
 })
 router.post('/', async (req, res) => {
-    const {error} = validateMovie(req.body)
+    let {error} = validateMovie(req.body)
     if(error) return res.status(400).send(`${error.name} : ${error.message}`)  
     const {title, genre_id, numberinstock, dailyrentalrate} = req.body
+    const result = await checkGenre(req.body.genre_id)
+    if(!result) return res.status(400).send(`Invalid Id : There is no genre with the provided Id...`)  
     try {
         const {rows} = await pool.query(`INSERT INTO movies VALUES(DEFAULT,'${title}','${genre_id}','${numberinstock}','${dailyrentalrate}') RETURNING *`)
         return res.status(200).json(rows[0])
@@ -35,10 +38,12 @@ router.post('/', async (req, res) => {
 })
 router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id)
-    const movie = await checkMovie(id)
-        if(!movie) return res.status(404).send("Invalid Id : There is no movie with the provided Id...")
     const {error} = validateMovie(req.body)
-    if(error) return res.status(400).send(`${error.name} : ${error.message}`)  
+    if(error) return res.status(400).send(`${error.name} : ${error.message}`) 
+    const movie = await checkMovie(id)
+    if(!movie) return res.status(404).send("Invalid Id : There is no movie with the provided Id...")
+    const result = await checkGenre(req.body.genre_id)
+    if(!result) return res.status(400).send(`Invalid Id : There is no genre with the provided Id...`)  
     const {title, genre_id, numberinstock, dailyrentalrate} = req.body
     try {
         const {rows} = await pool.query(`UPDATE movies SET title='${title}', genre_id='${genre_id}', numberinstock='${numberinstock}', dailyrentalrate='${dailyrentalrate}' WHERE id='${id}' RETURNING *`)
