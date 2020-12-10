@@ -1,4 +1,4 @@
-Mconst express = require('express')
+const express = require('express')
 const pool = require('../../databases/db')
 const { validateMovie, checkMovie } = require('../../models/movie.model')
 
