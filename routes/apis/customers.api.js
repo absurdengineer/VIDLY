@@ -1,24 +1,7 @@
-const Joi = require('joi')
 const express = require('express')
 const pool = require('../../databases/db')
-
+const {checkCustomer, validateCustomer} = require('../../models/customer.model')
 const router = express.Router()
-
-const customerSchema = Joi.object({
-    name : Joi.string().min(2).max(255).required(),
-    phone : Joi.number().min(6000000000).max(9999999999).required(),
-    isgold : Joi.boolean().required(),
-})
-const checkCustomer = async id => {
-    try{
-        const result = await pool.query(`SELECT * FROM customers WHERE id=${id}`)
-        if(result.rowCount===0) return false
-        return result.rows[0]
-    } catch({name, message}){
-        console.error(`${name} : ${message}`)
-    }
-}
-const validateCustomer = customer => customerSchema.validate(customer)
 
 router.get('/',async (req, res) => {
     try{
