@@ -1,6 +1,7 @@
 //Load Modules
 const express = require('express')
 const genres = require('./routes/apis/genres.api')
+const customers = require('./routes/apis/customers.api')
 
 // creating app
 const app = express()
@@ -13,6 +14,7 @@ app.use(express.json())
 
 // Routers 
 app.use('/api/genres/', genres)
+app.use('/api/customers/', customers)
 
 // Listener
 app.listen(port, () => {

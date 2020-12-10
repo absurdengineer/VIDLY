@@ -2,7 +2,7 @@ const express = require('express')
 const Joi = require('joi')
 const pool = require('../../databases/db')
 
-router = express.Router()
+const router = express.Router()
 
 const genreSchema = Joi.object({
     name : Joi.string().min(3).max(30).required()
@@ -10,7 +10,15 @@ const genreSchema = Joi.object({
 const validateGenre = genre => {
     return genreSchema.validate(genre)
 }
-
+const checkGenre = async id => {
+    try{
+        const result = await pool.query(`SELECT * FROM genres WHERE id=${id}`)
+        if(result.rowCount===0) return false
+        return result.rows[0]
+    } catch({name, message}){
+        console.error(`${name} : ${message}`)
+    }
+}
 router.get("/", async (req,res) => {
     try{
         const result = await pool.query('SELECT *  FROM genres')
@@ -22,12 +30,10 @@ router.get("/", async (req,res) => {
     }
 })
 router.get("/:id", async (req,res) => {
-    const id = parseInt(req.params.id)
     try{
-        const result = await pool.query(`SELECT *  FROM genres WHERE id=${id}`)
-        if(result.rowCount === 0)
-            return res.status(404).send("Invalid Id : There is no genre with the provided Id.")
-        return res.status(200).json(result.rows[0])
+        const result = await checkGenre(parseInt(req.params.id))
+        if(!result) return res.status(404).send("Invalid Id : There is no genre with the provided Id.")
+        return res.status(200).json(result)
     } catch({name, message}){
         console.error(`${name} : ${message}`)
     }
