@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const express = require('express')
+const bcrypt = require('bcrypt')
 const pool = require('../../databases/db')
 const {validateuser, checkUser} = require('../../models/user.model')
 
@@ -12,7 +13,9 @@ router.post("/", async (req,res) => {
     const user = await checkUser(email)
     if(!user) return res.status(400).send(`Already Registered : User with the email : ${email} already exists.`) 
     try{
-        const {rows} = await pool.query(`INSERT INTO users VALUES(DEFAULT, '${name}', '${email}','${password}') RETURNING *`)
+        const salt = await bcrypt.genSalt(11)
+        const hashedPassword = await bcrypt.hash(password, salt)
+        const {rows} = await pool.query(`INSERT INTO users VALUES(DEFAULT, '${name}', '${email}','${hashedPassword}') RETURNING *`)
         return res.status(200).json(_.pick(rows[0],['name', 'email']))
     } catch({name,message}){
         console.error(`${name} : ${message}`)
