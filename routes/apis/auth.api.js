@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 const Joi = require('joi')
 const express = require('express')
@@ -22,7 +23,10 @@ router.post("/", async (req,res) => {
         if(!user) return res.status(400).send(`Authentication Error : Invalid Email or Password...`) 
         const isValid = await bcrypt.compare(password,user.password)
         if(!isValid) return res.status(400).send('Authentication Error : Invalid Email or Password')
-        return res.status(200).json(_.pick(user,['name','email']))
+        const token = jwt.sign(_.pick(user,['id','name','email']), 'JwTpRiVaTeKeY')
+        //* sign will provide Digital Signature on first argument i.e., payload and 
+        //* Second Argument is a Private key which can be any string.
+        return res.status(200).send(token)
     } catch({name,message}){
         console.error(`${name} : ${message}`)
     }
