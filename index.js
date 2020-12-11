@@ -1,5 +1,6 @@
 //Load Modules
 const express = require('express')
+const config = require('config')
 const genres = require('./routes/apis/genres.api')
 const customers = require('./routes/apis/customers.api')
 const movies = require('./routes/apis/movies.api')
@@ -12,6 +13,10 @@ const app = express()
 
 // Settings
 const port = process.env.PORT || 3000
+if(!config.get('JSONPRIVATEKEY')) {
+    console.error('FATAL ERROR : JSONPRIVATEKEY is not defined!!!')
+    process.exit(1)
+}
 
 // Middlewares
 app.use(express.json())
