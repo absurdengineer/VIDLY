@@ -9,10 +9,12 @@
   "author": "dillu",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "config": "^3.3.3",
     "debug": "^4.3.1",
     "express": "^4.17.1",
     "joi": "^17.3.0",
+    "lodash": "^4.17.20",
     "mongoose": "^5.11.5",
     "nodemon": "^2.0.6",
     "pg": "^8.5.1"

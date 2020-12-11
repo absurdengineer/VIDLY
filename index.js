@@ -4,6 +4,7 @@ const genres = require('./routes/apis/genres.api')
 const customers = require('./routes/apis/customers.api')
 const movies = require('./routes/apis/movies.api')
 const rentals = require('./routes/apis/rentals.api')
+const users = require('./routes/apis/users.api')
 
 // creating app
 const app = express()
@@ -19,6 +20,7 @@ app.use('/api/genres/', genres)
 app.use('/api/customers/', customers)
 app.use('/api/movies/', movies)
 app.use('/api/rentals/', rentals)
+app.use('/api/users/', users)
 
 // Listener
 app.listen(port, () => {
