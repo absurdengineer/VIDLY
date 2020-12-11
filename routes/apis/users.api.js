@@ -11,7 +11,7 @@ router.post("/", async (req,res) => {
     if(error) return res.status(400).send(`${error.name} : ${error.message}`)
     const {name, email, password} = req.body
     const user = await checkUser(email)
-    if(!user) return res.status(400).send(`Already Registered : User with the email : ${email} already exists.`) 
+    if(user) return res.status(400).send(`Already Registered : User with the email : ${email} already exists.`) 
     try{
         const salt = await bcrypt.genSalt(11)
         const hashedPassword = await bcrypt.hash(password, salt)

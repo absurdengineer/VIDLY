@@ -7,9 +7,9 @@ const userSchema = Joi.object({
 })
 const checkUser = async email => {
     try {
-        const { rowCount } = await pool.query(`SELECT * FROM users where email='${email}';`)
-        if(!rowCount) return true
-        return false
+        const { rows,rowCount } = await pool.query(`SELECT * FROM users where email='${email}';`)
+        if(!rowCount) return false
+        return rows[0]
     } catch ({name, message}) {
         console.error(`${name} : ${message}`)
     }
