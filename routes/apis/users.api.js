@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken')
+const config = require('config')
 const _ = require('lodash')
 const express = require('express')
 const bcrypt = require('bcrypt')
@@ -16,7 +18,10 @@ router.post("/", async (req,res) => {
         const salt = await bcrypt.genSalt(11)
         const hashedPassword = await bcrypt.hash(password, salt)
         const {rows} = await pool.query(`INSERT INTO users VALUES(DEFAULT, '${name}', '${email}','${hashedPassword}') RETURNING *`)
-        return res.status(200).json(_.pick(rows[0],['name', 'email']))
+        const token = jwt.sign(_.pick(rows[0],['id','name','email']), config.get('JSONPRIVATEKEY'))
+        //* Sending JWT to user in Header after successful Registration.
+        //* use x- as pefix for any custom header 
+        return res.status(200).header('x-auth-token',token).json(_.pick(rows[0],['name', 'email']))
     } catch({name,message}){
         console.error(`${name} : ${message}`)
     }
