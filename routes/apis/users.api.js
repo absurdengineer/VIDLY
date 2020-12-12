@@ -17,7 +17,7 @@ router.get('/me', auth, async (req, res) => {
     res.status(200).send(_.pick(req.user, ['name','email','isadmin']))
 })
 
-router.post("/", async (req,res) => {
+router.post("/", async (req,res, next) => {
     const {error} = validateuser(req.body)
     if(error) return res.status(400).send(`${error.name} : ${error.message}`)
     const {name, email, password} = req.body
@@ -31,9 +31,8 @@ router.post("/", async (req,res) => {
         //* Sending JWT to user in Header after successful Registration.
         //* use x- as pefix for any custom header 
         return res.status(200).header('x-auth-token',token).json(_.pick(rows[0],['name', 'email', 'isAdmin']))
-    } catch({name,message}){
-        console.error(`${name} : ${message}`)
-        res.status(500).send('Something Went Wrong!!!')
+    } catch(error){
+        next(error)
     }
 })
 

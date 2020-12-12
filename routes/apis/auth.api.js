@@ -15,7 +15,7 @@ const userSchema = Joi.object({
 
 const validate = (user) => userSchema.validate(user)
 
-router.post("/", async (req,res) => {
+router.post("/", async (req, res, next) => {
     try{
         const {error} = validate(req.body)
         if(error) return res.status(400).send(`${error.name} : ${error.message}`)
@@ -28,9 +28,8 @@ router.post("/", async (req,res) => {
         //* sign will provide Digital Signature on first argument i.e., payload and 
         //* Second Argument is a Private key which can be any string.
         return res.status(200).send(token)
-    } catch({name,message}){
-        console.error(`${name} : ${message}`)
-        res.status(500).send('Something Went Wrong!!!')
+    } catch(error){
+        next(error)
     }
 })
 
