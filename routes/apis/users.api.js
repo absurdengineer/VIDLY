@@ -3,10 +3,15 @@ const config = require('config')
 const _ = require('lodash')
 const express = require('express')
 const bcrypt = require('bcrypt')
+const auth = require('../../middlewares/auth.middleware')
 const pool = require('../../databases/db')
 const {validateuser, checkUser} = require('../../models/user.model')
 
 const router = express.Router()
+
+router.get('/me', auth, async (req, res) => {
+    res.status(200).send(_.pick(req.user, ['name','email']))
+})
 
 router.post("/", async (req,res) => {
     const {error} = validateuser(req.body)
