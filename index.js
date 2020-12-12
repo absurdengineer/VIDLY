@@ -1,4 +1,5 @@
 //Load Modules
+require('express-async-errors')
 const express = require('express')
 const config = require('config')
 const genres = require('./routes/apis/genres.api')
