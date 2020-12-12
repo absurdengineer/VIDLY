@@ -1,4 +1,4 @@
-//Load Modules
+//? Load Modules
 require('express-async-errors')
 const express = require('express')
 const config = require('config')
@@ -11,23 +11,31 @@ const users = require('./routes/apis/users.api')
 const auth = require('./routes/apis/auth.api')
 const error = require('./middlewares/error.middleware')
 
-// creating app
+//? creating app
 const app = express()
 
-// Settings
+//? Settings
 const port = process.env.PORT || 3000
 if(!config.get('JSONPRIVATEKEY')) {
     console.error('FATAL ERROR : JSONPRIVATEKEY is not defined!!!')
     process.exit(1)
 }
 
-// Middlewares
+//? Middlewares
 app.use(express.json())
 
-// Loggers
+//? Loggers
 winston.add(winston.transports.File, {filename : 'logfile.log'})
 
-// Routers 
+//? Handling uncaughtException
+process.on('uncaughtException', (ex) => {
+    winston.error(ex.message,ex)
+})
+
+//? throwing Exception to check 
+//!throw new Error(`Error Occured during startup!!!`)
+
+//? Routers 
 app.use('/api/genres/', genres)
 app.use('/api/customers/', customers)
 app.use('/api/movies/', movies)
@@ -35,10 +43,10 @@ app.use('/api/rentals/', rentals)
 app.use('/api/users/', users)
 app.use('/api/auth/', auth)
 
-// Middlewares to load after Route Handlers
+//? Middlewares to load after Route Handlers
 app.use(error)
 
-// Listener
+//? Listener
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)
     console.log(`Starting Server at http://127.0.0.1:${port}/`)
