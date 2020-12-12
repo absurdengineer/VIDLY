@@ -5,6 +5,7 @@ const Joi = require('joi')
 const express = require('express')
 const bcrypt = require('bcrypt')
 const {checkUser} = require('../../models/user.model')
+const asyncMiddleware = require('../../middlewares/async.middleware')
 
 const router = express.Router()
 
@@ -15,8 +16,7 @@ const userSchema = Joi.object({
 
 const validate = (user) => userSchema.validate(user)
 
-router.post("/", async (req, res, next) => {
-    try{
+router.post("/", asyncMiddleware(async (req, res) => {
         const {error} = validate(req.body)
         if(error) return res.status(400).send(`${error.name} : ${error.message}`)
         const {email, password} = req.body
@@ -28,9 +28,7 @@ router.post("/", async (req, res, next) => {
         //* sign will provide Digital Signature on first argument i.e., payload and 
         //* Second Argument is a Private key which can be any string.
         return res.status(200).send(token)
-    } catch(error){
-        next(error)
-    }
-})
+    })
+)
 
 module.exports = router
