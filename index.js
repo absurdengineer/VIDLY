@@ -2,6 +2,7 @@
 require('express-async-errors')
 const express = require('express')
 const config = require('config')
+const winston = require('winston')
 const genres = require('./routes/apis/genres.api')
 const customers = require('./routes/apis/customers.api')
 const movies = require('./routes/apis/movies.api')
@@ -22,6 +23,9 @@ if(!config.get('JSONPRIVATEKEY')) {
 
 // Middlewares
 app.use(express.json())
+
+// Loggers
+winston.add(winston.transports.File, {filename : 'logfile.log'})
 
 // Routers 
 app.use('/api/genres/', genres)

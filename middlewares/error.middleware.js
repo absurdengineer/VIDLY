@@ -1,5 +1,6 @@
+const winston = require('winston')
 //?       exception, request, response, next
 module.exports = (ex, req, res, next) => {
-    console.error(`${ex.name} : ${ex.message}`)
+    winston.error(ex.message, ex)
     res.status(500).send('Something Went Wrong!!!')
 }
