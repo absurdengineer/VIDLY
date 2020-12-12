@@ -9,6 +9,10 @@ const {validateuser, checkUser} = require('../../models/user.model')
 
 const router = express.Router()
 
+//? No need to implement Log out Feature here because we're not storing the Auth Token 
+//? anywhere in the server. 
+//? To Log Out simply delete the token from header via client application and the user 
+//? will be Logged Out.
 router.get('/me', auth, async (req, res) => {
     res.status(200).send(_.pick(req.user, ['name','email']))
 })
