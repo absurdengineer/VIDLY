@@ -14,6 +14,7 @@ router.get('/', auth, async (req, res) => {
         return res.status(200).json(rows)
     } catch({name, message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.get('/:id', auth, async (req, res) => {
@@ -23,6 +24,7 @@ router.get('/:id', auth, async (req, res) => {
         return res.status(200).json(movie)
     } catch({name, message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.post('/', auth, async (req, res) => {
@@ -35,7 +37,8 @@ router.post('/', auth, async (req, res) => {
         const {rows} = await pool.query(`INSERT INTO movies VALUES(DEFAULT,'${title}','${genre_id}','${numberinstock}','${dailyrentalrate}') RETURNING *`)
         return res.status(200).json(rows[0])
     } catch ({name, message}) {
-        return res.status(400).send(`${name} : ${message}`)
+        console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.put('/:id', auth, async (req, res) => {
@@ -51,7 +54,8 @@ router.put('/:id', auth, async (req, res) => {
         const {rows} = await pool.query(`UPDATE movies SET title='${title}', genre_id='${genre_id}', numberinstock='${numberinstock}', dailyrentalrate='${dailyrentalrate}' WHERE id='${id}' RETURNING *`)
         return res.status(200).json(rows[0])
     } catch ({name, message}) {
-        return res.status(400).send(`${name} : ${message}`)
+        console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.delete('/:id', [auth, admin], async (req, res) => {
@@ -62,7 +66,8 @@ router.delete('/:id', [auth, admin], async (req, res) => {
         const {rows} = await pool.query(`DELETE FROM movies WHERE id='${id}' RETURNING *`)
         return res.status(200).json(rows[0])
     } catch ({name, message}) {
-        return res.status(400).send(`${name} : ${message}`)
+        console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 

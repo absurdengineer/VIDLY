@@ -33,6 +33,7 @@ router.post("/", async (req,res) => {
         return res.status(200).header('x-auth-token',token).json(_.pick(rows[0],['name', 'email', 'isAdmin']))
     } catch({name,message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 

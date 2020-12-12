@@ -30,6 +30,7 @@ router.post("/", async (req,res) => {
         return res.status(200).send(token)
     } catch({name,message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 

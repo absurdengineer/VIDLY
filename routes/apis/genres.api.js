@@ -14,6 +14,7 @@ router.get("/", async (req,res) => {
         return res.status(200).json(result.rows)
     } catch({name, message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.get("/:id", async (req,res) => {
@@ -23,6 +24,7 @@ router.get("/:id", async (req,res) => {
         return res.status(200).json(result)
     } catch({name, message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.post("/", auth, async (req,res) => {
@@ -34,6 +36,7 @@ router.post("/", auth, async (req,res) => {
         return res.status(200).send(result.rows[0])
     } catch({name,message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.put("/:id", auth, async (req,res) => {
@@ -49,6 +52,7 @@ router.put("/:id", auth, async (req,res) => {
         return res.status(200).json(result.rows[0])
     } catch({name,message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 router.delete("/:id", [auth, admin], async (req,res) => {
@@ -61,6 +65,7 @@ router.delete("/:id", [auth, admin], async (req,res) => {
         return res.status(200).json(result.rows[0])
     } catch({name, message}){
         console.error(`${name} : ${message}`)
+        res.status(500).send('Something Went Wrong!!!')
     }
 })
 
