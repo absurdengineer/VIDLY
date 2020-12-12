@@ -1,11 +1,12 @@
 const express = require('express')
+const auth = require('../../middlewares/auth.middleware')
 const pool = require('../../databases/db')
 const { checkRental, validateRental } = require('../../models/rental.model')
 const {checkCustomer} = require('../../models/customer.model')
 const {checkMovie} = require('../../models/movie.model')
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const {rows, rowCount} = await pool.query(`SELECT R.id, C.name as customerName ,M.title as movieTitle ,R.dateOut,R.dateReturn,R.rentalFee from rentals R JOIN customers C ON R.customer_id=C.id JOIN movies M ON R.movie_id=M.id ORDER BY R.dateOut DESC;`)
         if(!rowCount) return res.status(200).send(`There is no data in this API...`)
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
         console.log(`${name} : ${message}`)
     }
 })
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     try {
         const rental = await checkRental(parseInt(req.params.id))
         if(!rental) return res.status(404).send(`Invalid Id : There is no Rental with the provided Id...`)
@@ -23,7 +24,7 @@ router.get('/:id', async (req, res) => {
         console.log(`${name} : ${message}`)
     }
 })
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
         const {error} = validateRental(req.body)
         if(error) return res.status(400).send(`${error.name} : ${error.message}`)

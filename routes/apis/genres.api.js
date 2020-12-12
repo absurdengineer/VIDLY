@@ -1,4 +1,5 @@
 const express = require('express')
+const auth = require('../../middlewares/auth.middleware')
 const pool = require('../../databases/db')
 const {checkGenre, validateGenre} = require('../../models/genre.model')
 
@@ -23,7 +24,7 @@ router.get("/:id", async (req,res) => {
         console.error(`${name} : ${message}`)
     }
 })
-router.post("/", async (req,res) => {
+router.post("/", auth, async (req,res) => {
     const {error} = validateGenre(req.body)
     if(error) return res.status(400).send(error.message)
     const {name} = req.body
@@ -34,7 +35,7 @@ router.post("/", async (req,res) => {
         console.error(`${name} : ${message}`)
     }
 })
-router.put("/:id", async (req,res) => {
+router.put("/:id", auth, async (req,res) => {
     const id = parseInt(req.params.id)
     let result = await pool.query(`SELECT *  FROM genres WHERE id=${id}`)
     if(result.rowCount === 0)
@@ -49,7 +50,7 @@ router.put("/:id", async (req,res) => {
         console.error(`${name} : ${message}`)
     }
 })
-router.delete("/:id", async (req,res) => {
+router.delete("/:id", auth, async (req,res) => {
     const id = parseInt(req.params.id)
     let result = await pool.query(`SELECT *  FROM genres WHERE id=${id}`)
     if(result.rowCount === 0)
