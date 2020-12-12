@@ -29,6 +29,7 @@ winston.add(winston.transports.File, {filename : 'logfile.log'})
 
 //? Handling uncaughtException
 process.on('uncaughtException', (ex) => {
+    console.log(`Node got an Unhandled Excption.`)
     winston.error(ex.message,ex)
 })
 
