@@ -1,5 +1,6 @@
 const express = require('express')
 const auth = require('../../middlewares/auth.middleware')
+const admin = require('../../middlewares/admin.middleware')
 const pool = require('../../databases/db')
 const {checkGenre, validateGenre} = require('../../models/genre.model')
 
@@ -50,7 +51,7 @@ router.put("/:id", auth, async (req,res) => {
         console.error(`${name} : ${message}`)
     }
 })
-router.delete("/:id", auth, async (req,res) => {
+router.delete("/:id", [auth, admin], async (req,res) => {
     const id = parseInt(req.params.id)
     let result = await pool.query(`SELECT *  FROM genres WHERE id=${id}`)
     if(result.rowCount === 0)

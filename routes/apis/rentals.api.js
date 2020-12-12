@@ -1,12 +1,13 @@
 const express = require('express')
 const auth = require('../../middlewares/auth.middleware')
+const admin = require('../../middlewares/admin.middleware')
 const pool = require('../../databases/db')
 const { checkRental, validateRental } = require('../../models/rental.model')
 const {checkCustomer} = require('../../models/customer.model')
 const {checkMovie} = require('../../models/movie.model')
 const router = express.Router()
 
-router.get('/', auth, async (req, res) => {
+router.get('/', [auth, admin], async (req, res) => {
     try {
         const {rows, rowCount} = await pool.query(`SELECT R.id, C.name as customerName ,M.title as movieTitle ,R.dateOut,R.dateReturn,R.rentalFee from rentals R JOIN customers C ON R.customer_id=C.id JOIN movies M ON R.movie_id=M.id ORDER BY R.dateOut DESC;`)
         if(!rowCount) return res.status(200).send(`There is no data in this API...`)

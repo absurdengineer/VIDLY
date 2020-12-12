@@ -1,5 +1,6 @@
 const express = require('express')
 const auth = require('../../middlewares/auth.middleware')
+const admin = require('../../middlewares/admin.middleware')
 const pool = require('../../databases/db')
 const { validateMovie, checkMovie } = require('../../models/movie.model')
 const { checkGenre } = require('../../models/genre.model')
@@ -53,7 +54,7 @@ router.put('/:id', auth, async (req, res) => {
         return res.status(400).send(`${name} : ${message}`)
     }
 })
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     const id = parseInt(req.params.id)
     const movie = await checkMovie(id)
         if(!movie) return res.status(404).send("Invalid Id : There is no movie with the provided Id...")

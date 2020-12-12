@@ -1,6 +1,7 @@
 const express = require('express')
 const pool = require('../../databases/db')
 const auth = require('../../middlewares/auth.middleware')
+const admin = require('../../middlewares/admin.middleware')
 const {checkCustomer, validateCustomer} = require('../../models/customer.model')
 const router = express.Router()
 
@@ -48,7 +49,8 @@ router.put('/:id', auth, async (req, res) => {
         console.error(`${name} : ${message}`)
     }
 })
-router.delete('/:id', auth, async (req, res) => {
+// ?         [firstMiddlware, secondMiddleware]
+router.delete('/:id', [auth, admin], async (req, res) => {
     const id = parseInt(req.params.id)
     try {
         const result = await checkCustomer(id)

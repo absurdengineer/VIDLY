@@ -14,7 +14,7 @@ const router = express.Router()
 //? To Log Out simply delete the token from header via client application and the user 
 //? will be Logged Out.
 router.get('/me', auth, async (req, res) => {
-    res.status(200).send(_.pick(req.user, ['name','email']))
+    res.status(200).send(_.pick(req.user, ['name','email','isadmin']))
 })
 
 router.post("/", async (req,res) => {
@@ -26,11 +26,11 @@ router.post("/", async (req,res) => {
     try{
         const salt = await bcrypt.genSalt(11)
         const hashedPassword = await bcrypt.hash(password, salt)
-        const {rows} = await pool.query(`INSERT INTO users VALUES(DEFAULT, '${name}', '${email}','${hashedPassword}') RETURNING *`)
-        const token = jwt.sign(_.pick(rows[0],['id','name','email']), config.get('JSONPRIVATEKEY'))
+        const {rows} = await pool.query(`INSERT INTO users VALUES(DEFAULT, '${name}', '${email}','${hashedPassword}', DEFAULT) RETURNING *`)
+        const token = jwt.sign(_.pick(rows[0],['id','name','email','isadmin']), config.get('JSONPRIVATEKEY'))
         //* Sending JWT to user in Header after successful Registration.
         //* use x- as pefix for any custom header 
-        return res.status(200).header('x-auth-token',token).json(_.pick(rows[0],['name', 'email']))
+        return res.status(200).header('x-auth-token',token).json(_.pick(rows[0],['name', 'email', 'isAdmin']))
     } catch({name,message}){
         console.error(`${name} : ${message}`)
     }

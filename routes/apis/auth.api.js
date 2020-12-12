@@ -21,10 +21,10 @@ router.post("/", async (req,res) => {
         if(error) return res.status(400).send(`${error.name} : ${error.message}`)
         const {email, password} = req.body
         const user = await checkUser(email)
-        if(!user) return res.status(400).send(`Authentication Error : Invalid Email or Password...`) 
+        if(!user) return res.status(400).send(`Authentication Error : Invalid Email or Password`) 
         const isValid = await bcrypt.compare(password,user.password)
         if(!isValid) return res.status(400).send('Authentication Error : Invalid Email or Password')
-        const token = jwt.sign(_.pick(user,['id','name','email']), config.get('JSONPRIVATEKEY'))
+        const token = jwt.sign(_.pick(user,['id','name','email','isadmin']), config.get('JSONPRIVATEKEY'))
         //* sign will provide Digital Signature on first argument i.e., payload and 
         //* Second Argument is a Private key which can be any string.
         return res.status(200).send(token)
