@@ -7,12 +7,12 @@ const { checkGenre } = require('../../models/genre.model')
 
 const router = express.Router()
 
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
     const {rowCount, rows} = await pool.query(`SELECT M.id,M.title,G.name as genre ,M.numberinstock,M.dailyrentalrate from movies as M JOIN genres as G ON M.genre_id=G.id;`)
     if(!rowCount) return res.status(200).send("There is no Data in this API.")
     return res.status(200).json(rows)
 })
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
     const movie = await checkMovie(parseInt(req.params.id))
     if(!movie) return res.status(404).send("Invalid Id : There is no movie with the provided Id...")
     return res.status(200).json(movie)

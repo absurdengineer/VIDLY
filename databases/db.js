@@ -1,4 +1,5 @@
 const {Pool} = require('pg')
+const winston =  require('winston')
 const config = require('config')
 const vidlyDebug = require('debug')('vidlyDebug')
 const pool = new Pool({
@@ -14,10 +15,10 @@ vidlyDebug(
     '\nPostgres User : ',config.get('PGUSER'),
     '\nPostgres Password : ',config.get('PGPASSWORD'),
     '\nPostgres Database : ',config.get('PGDATABASE'),
-    '\nPostgres Port : ',config.get('PGPORT'))
+    '\nPostgres Port : ',config.get('PGPORT')
+)
 
 pool.connect()
-    .then( () => console.log(`Connected to ${config.get('PGDATABASE')} as ${config.get('PGUSER')} over port ${config.get('PGPORT')}`) )
-    .catch( ({name, message}) => console.error(`${name} : ${message}`))
+    .then( () => winston.info(`Connected to ${config.get('PGDATABASE')} as ${config.get('PGUSER')} over port ${config.get('PGPORT')}`) )
 
 module.exports = pool

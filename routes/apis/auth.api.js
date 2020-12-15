@@ -5,7 +5,6 @@ const Joi = require('joi')
 const express = require('express')
 const bcrypt = require('bcrypt')
 const {checkUser} = require('../../models/user.model')
-const asyncMiddleware = require('../../middlewares/async.middleware')
 
 const router = express.Router()
 
@@ -16,19 +15,20 @@ const userSchema = Joi.object({
 
 const validate = (user) => userSchema.validate(user)
 
-router.post("/", asyncMiddleware(async (req, res) => {
-        const {error} = validate(req.body)
-        if(error) return res.status(400).send(`${error.name} : ${error.message}`)
-        const {email, password} = req.body
-        const user = await checkUser(email)
-        if(!user) return res.status(400).send(`Authentication Error : Invalid Email or Password`) 
-        const isValid = await bcrypt.compare(password,user.password)
-        if(!isValid) return res.status(400).send('Authentication Error : Invalid Email or Password')
-        const token = jwt.sign(_.pick(user,['id','name','email','isadmin']), config.get('JSONPRIVATEKEY'))
-        //* sign will provide Digital Signature on first argument i.e., payload and 
-        //* Second Argument is a Private key which can be any string.
-        return res.status(200).send(token)
-    })
-)
+router.post("/", async (req, res) => {
+    const {error} = validate(req.body)
+    if(error) return res.status(400).send(`${error.name} : ${error.message}`)
+    const {email, password} = req.body
+    const user = await checkUser(email)
+    if(!user) return res.status(400).send(`Authentication Error : Invalid Email or Password`) 
+    const isValid = await bcrypt.compare(password,user.password)
+    if(!isValid) return res.status(400).send('Authentication Error : Invalid Email or Password')
+    const token = jwt.sign(_.pick(user,['id','name','email','isadmin']), config.get('JSONPRIVATEKEY'))
+    //* sign will provide Digital Signature on first argument i.e., payload and 
+    //* Second Argument is a Private key which can be any string.
+    res.header('x-auth-token',token)
+    return res.status(200).send(token)
+})
+
 
 module.exports = router

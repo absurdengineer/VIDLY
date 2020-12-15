@@ -5,18 +5,18 @@ const admin = require('../../middlewares/admin.middleware')
 const {checkCustomer, validateCustomer} = require('../../models/customer.model')
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.get('/', [auth , admin], async (req, res) => {
     const result = await pool.query('SELECT * FROM customers ORDER BY id ASC')
     if(result.rowCount === 0) return res.status(200).send("There is no data in this API...")
     res.status(200).json(result.rows)
 })
-router.get('/:id',async (req, res) => {
+router.get('/:id', [auth , admin], async (req, res) => {
     const result = await checkCustomer(parseInt(req.params.id))
     if(!result) return res.status(404).send("Invalid Id : There is no customer with the provided Id...")
     return res.status(200).json(result)
 })
 //?        ( route, middleware, handler )
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
     const {error} = validateCustomer(req.body)
     if(error) return res.status(400).send(error.message)
     const {name, phone, isgold} = req.body
