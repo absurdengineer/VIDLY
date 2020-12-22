@@ -17,7 +17,7 @@ router.get('/:id', async (req, res) => {
     if(!movie) return res.status(404).send("Invalid Id : There is no movie with the provided Id...")
     return res.status(200).json(movie)
 })
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     let {error} = validateMovie(req.body)
     if(error) return res.status(400).send(`${error.name} : ${error.message}`)  
     const {title, genre_id, numberinstock, dailyrentalrate} = req.body
@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
     const {rows} = await pool.query(`INSERT INTO movies VALUES(DEFAULT,'${title}','${genre_id}','${numberinstock}','${dailyrentalrate}') RETURNING *`)
     return res.status(200).json(rows[0])
 })
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', auth, async (req, res, next) => {
     const id = parseInt(req.params.id)
     const {error} = validateMovie(req.body)
     if(error) return res.status(400).send(`${error.name} : ${error.message}`) 
