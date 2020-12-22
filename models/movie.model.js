@@ -12,7 +12,7 @@ const validateMovie = (movie) => movieSchema.validate(movie)
 
 const checkMovie = async id => {
     try {
-        const {rows,rowCount} = await pool.query(`SELECT M.id,M.title,G.name as genre ,M.numberinstock,M.dailyrentalrate from movies as M JOIN genres as G ON M.genre_id=G.id WHERE M.id=${id};`)
+        const {rows,rowCount} = await pool.query(`SELECT * from movies WHERE id=${id};`)
         if(rowCount === 0) return false
         return rows[0]
     } catch ({name, message}) {

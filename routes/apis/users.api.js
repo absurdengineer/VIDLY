@@ -28,7 +28,10 @@ router.post("/", async (req,res, next) => {
     const token = jwt.sign(_.pick(rows[0],['id','name','email','isadmin']), config.get('JSONPRIVATEKEY'))
     //* Sending JWT to user in Header after successful Registration.
     //* use x- as pefix for any custom header 
-    return res.status(200).header('x-auth-token',token).json(_.pick(rows[0],['name', 'email', 'isAdmin']))
+    return res.status(200)
+        .header('x-auth-token',token)
+        .header('access-control-expose-headers', 'x-auth-token')
+        .json(_.pick(rows[0],['name', 'email', 'isAdmin']))
 })
 
 module.exports = router
